@@ -25,11 +25,15 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('Login attempt:', { body: req.body });
     const { username, password, device_type = 'desktop', device_info = 'Python App' } = req.body;
 
     if (!username || !password) {
+      console.log('Missing credentials');
       return res.status(400).json({ error: 'Username dan password harus diisi' });
     }
+
+    console.log('Searching for user:', username);
 
     const { data: user, error: userError } = await supabase
       .from('users')
@@ -38,7 +42,10 @@ export default async function handler(req, res) {
       .eq('status', 'active')
       .single();
 
+    console.log('User query result:', { user, userError });
+
     if (userError || !user) {
+      console.log('User not found or error:', userError);
       return res.status(401).json({ error: 'Username atau password salah' });
     }
 
