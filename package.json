@@ -2,18 +2,9 @@
   "name": "mudaii-auth-system",
   "version": "1.0.0",
   "description": "Authentication system for Muda-Mudi management app",
-  "main": "index.js",
-  "scripts": {
-    "dev": "vercel dev",
-    "build": "vercel build",
-    "deploy": "vercel --prod"
-  },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2"
-  },
-  "devDependencies": {
-    "vercel": "^32.0.0"
   }
 }
