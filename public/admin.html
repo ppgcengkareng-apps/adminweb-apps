@@ -282,6 +282,45 @@
         </div>
     </div>
 
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('editUserModal')">&times;</span>
+            <h2>Edit User</h2>
+            <form id="editUserForm">
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label for="editUsername">Username</label>
+                    <input type="text" id="editUsername" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Email</label>
+                    <input type="email" id="editEmail" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="editPassword">New Password (leave blank to keep current)</label>
+                    <input type="password" id="editPassword" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="editRole">Role</label>
+                    <select id="editRole" class="form-control" required>
+                        <option value="super_admin">Super Admin</option>
+                        <option value="admin">Admin</option>
+                        <option value="admin_desa">Admin Desa</option>
+                        <option value="admin_kelompok">Admin Kelompok</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editStatus">Status</label>
+                    <select id="editStatus" class="form-control" required>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Update User</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         const API_BASE_URL = 'https://adminweb-apps.vercel.app';
         let currentUser = null;
@@ -450,8 +489,35 @@
             }
         }
         
-        function editUser(userId) {
-            alert('Edit user functionality coming soon!');
+        async function editUser(userId) {
+            try {
+                // Get user data
+                const response = await fetch(`${API_BASE_URL}/api/user/list`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const user = data.data.find(u => u.id === userId);
+                    if (user) {
+                        // Populate edit form
+                        document.getElementById('editUserId').value = user.id;
+                        document.getElementById('editUsername').value = user.username;
+                        document.getElementById('editEmail').value = user.email || '';
+                        document.getElementById('editPassword').value = '';
+                        document.getElementById('editRole').value = user.role;
+                        document.getElementById('editStatus').value = user.status;
+                        
+                        // Show modal
+                        document.getElementById('editUserModal').style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                alert('Error loading user data: ' + error.message);
+            }
         }
         
         function deleteUser(userId) {
@@ -494,6 +560,46 @@
                     alert('User berhasil dibuat!');
                     closeModal('createUserModal');
                     document.getElementById('createUserForm').reset();
+                    loadUsers();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+
+        document.getElementById('editUserForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const userId = document.getElementById('editUserId').value;
+            const formData = {
+                username: document.getElementById('editUsername').value,
+                email: document.getElementById('editEmail').value,
+                role: document.getElementById('editRole').value,
+                status: document.getElementById('editStatus').value
+            };
+            
+            const password = document.getElementById('editPassword').value;
+            if (password) {
+                formData.password = password;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/user/update/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('User berhasil diupdate!');
+                    closeModal('editUserModal');
                     loadUsers();
                 } else {
                     alert('Error: ' + data.error);
