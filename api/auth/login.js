@@ -49,10 +49,16 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Username atau password salah' });
     }
 
+    console.log('Comparing password:', { password, hash: user.password_hash });
     const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    console.log('Password comparison result:', isValidPassword);
+    
     if (!isValidPassword) {
+      console.log('Password mismatch');
       return res.status(401).json({ error: 'Username atau password salah' });
     }
+    
+    console.log('Password valid, generating tokens');
 
     const accessToken = jwt.sign(
       { 
