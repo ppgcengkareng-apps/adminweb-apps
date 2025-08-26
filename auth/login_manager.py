@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
 
 class LoginManager:
-    def __init__(self, api_base_url="https://your-actual-vercel-url.vercel.app"):
+    def __init__(self, api_base_url="https://adminweb-apps.vercel.app"):
         self.api_base_url = api_base_url
         self.token_file = "auth_tokens.dat"
         self.key_file = "auth.key"
