@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Sistem Muda-Mudi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background: #1976D2;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1976D2;
+        }
+        
+        .btn-danger {
+            background: #F44336;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #D32F2F;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1976D2;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #1976D2;
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 500px;
+            position: relative;
+        }
+        
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🕌 Admin Dashboard - Sistem Muda-Mudi</h1>
+        <div class="user-info">
+            <span id="userInfo">Loading...</span>
+            <button class="btn btn-danger" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">-</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeUsers">-</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeSessions">-</div>
+                <div class="stat-label">Active Sessions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4</div>
+                <div class="stat-label">User Roles</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                User Management
+                <button class="btn btn-primary" style="float: right;" onclick="showCreateUserModal()">
+                    + Create User
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="usersTable" class="loading">Loading users...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="createUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('createUserModal')">&times;</span>
+            <h2>Create New User</h2>
+            <form id="createUserForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" class="form-control" required>
+                        <option value="">Select Role</option>
+                        <option value="super_admin">Super Admin</option>
+                        <option value="admin">Admin</option>
+                        <option value="admin_desa">Admin Desa</option>
+                        <option value="admin_kelompok">Admin Kelompok</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Create User</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://your-vercel-app.vercel.app';
+        let currentUser = null;
+        let authToken = localStorage.getItem('admin_token');
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!authToken) {
+                showLoginPrompt();
+                return;
+            }
+            
+            verifyToken().then(valid => {
+                if (valid) {
+                    loadDashboard();
+                } else {
+                    showLoginPrompt();
+                }
+            });
+        });
+
+        function showLoginPrompt() {
+            const username = prompt('Username:');
+            const password = prompt('Password:');
+            
+            if (username && password) {
+                login(username, password);
+            } else {
+                document.body.innerHTML = '<div style="text-align: center; padding: 50px;">Access denied. Please refresh and login.</div>';
+            }
+        }
+
+        async function login(username, password) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username,
+                        password,
+                        device_type: 'web',
+                        device_info: 'Admin Dashboard'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    authToken = data.data.access_token;
+                    currentUser = data.data.user;
+                    localStorage.setItem('admin_token', authToken);
+                    
+                    if (currentUser.role !== 'super_admin') {
+                        alert('Access denied. Super admin role required.');
+                        logout();
+                        return;
+                    }
+                    
+                    loadDashboard();
+                } else {
+                    alert('Login failed: ' + data.error);
+                    showLoginPrompt();
+                }
+            } catch (error) {
+                alert('Login error: ' + error.message);
+                showLoginPrompt();
+            }
+        }
+
+        async function verifyToken() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/verify`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                if (data.success && data.user) {
+                    currentUser = data.user;
+                    return currentUser.role === 'super_admin';
+                }
+                return false;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('admin_token');
+            authToken = null;
+            currentUser = null;
+            location.reload();
+        }
+
+        async function loadDashboard() {
+            document.getElementById('userInfo').textContent = 
+                `${currentUser.username} (${currentUser.role})`;
+
+            loadUsers();
+            document.getElementById('totalUsers').textContent = '4';
+            document.getElementById('activeUsers').textContent = '3';
+            document.getElementById('activeSessions').textContent = '2';
+        }
+
+        function loadUsers() {
+            const usersTable = document.getElementById('usersTable');
+            usersTable.innerHTML = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>superadmin</td>
+                            <td>admin@mudaii.com</td>
+                            <td>super_admin</td>
+                            <td><span class="badge badge-success">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>admin_bandara</td>
+                            <td>bandara@mudaii.com</td>
+                            <td>admin_desa</td>
+                            <td><span class="badge badge-success">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary">Edit</button>
+                                <button class="btn btn-danger">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function showCreateUserModal() {
+            document.getElementById('createUserModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        document.getElementById('createUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('User created successfully! (Demo)');
+            closeModal('createUserModal');
+            loadUsers();
+        });
+    </script>
+</body>
+</html>
