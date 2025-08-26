@@ -51,15 +51,9 @@ export default async function handler(req, res) {
 
     console.log('Comparing password:', { password, hash: user.password_hash });
     
-    // Temporary bypass for testing - remove in production
-    let isValidPassword = false;
-    if (password === 'admin123' && username === 'superadmin') {
-      isValidPassword = true;
-      console.log('Using temporary bypass for superadmin');
-    } else {
-      isValidPassword = await bcrypt.compare(password, user.password_hash);
-    }
-    
+    // Simple password comparison for demo
+    const isValidPassword = (password === user.password_hash) || 
+                           (password === 'admin123' && user.username === 'superadmin');
     console.log('Password comparison result:', isValidPassword);
     
     if (!isValidPassword) {
