@@ -434,11 +434,39 @@
             document.getElementById(modalId).style.display = 'none';
         }
 
-        document.getElementById('createUserForm').addEventListener('submit', function(e) {
+        document.getElementById('createUserForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            alert('User created successfully! (Demo)');
-            closeModal('createUserModal');
-            loadUsers();
+            
+            const formData = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                role: document.getElementById('role').value
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/user/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('User berhasil dibuat!');
+                    closeModal('createUserModal');
+                    document.getElementById('createUserForm').reset();
+                    loadUsers();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
         });
     </script>
 </body>
